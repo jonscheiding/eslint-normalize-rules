@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "outDir": "./lib",
+    "strictNullChecks": true,
+    "paths": {
+      "*": ["./types"]
+    }
+  },
+  "include": ["./**/*.ts"]
+}
