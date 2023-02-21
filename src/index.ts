@@ -1,14 +1,33 @@
+import { resolve } from "path";
 import { Legacy } from "@eslint/eslintrc";
 
-interface HasRules {
-  rules: Record<string, any> | null;
+interface Options {
+  level?: "warn" | "error";
+  includeExplicit?: boolean;
 }
 
-export function overrideRules<T extends HasRules>(config: T): T {
+interface Config {
+  rules?: Record<string, any>;
+}
+
+export function normalizeRules<T extends Config>(
+  config: T,
+  options?: Options
+): T {
+  const level = options?.level ?? "error";
+  const includeExplicit = options?.includeExplicit ?? false;
+  const eslintPath = require.resolve("eslint");
+
+  const needsToChange = (value: any): boolean =>
+    value !== level && value !== "off" && value !== 0;
+
+  const explicitRules: Record<string, any> = config.rules ?? {};
+
   const factory = new Legacy.ConfigArrayFactory({
-    getEslintAllConfig: () => require("node_modules/eslint/conf/eslint-all"),
+    getEslintAllConfig: () =>
+      require(resolve(eslintPath, "../../conf/eslint-all")),
     getEslintRecommendedConfig: () =>
-      require("node_modules/eslint/conf/eslint-recommended"),
+      require(resolve(eslintPath, "../../conf/eslint-recommended")),
   });
 
   const results = factory.create(config);
@@ -22,12 +41,23 @@ export function overrideRules<T extends HasRules>(config: T): T {
   }
 
   for (const rule of Object.keys(rules)) {
-    if (rules[rule] === "warn" || rules[rule] === 1) {
-      rules[rule] = "error";
+    switch (typeof rules[rule]) {
+      case "string":
+      case "number":
+        if (needsToChange(rules[rule])) {
+          rules[rule] = level;
+        }
+        break;
+      default:
+        if (Array.isArray(rules[rule]) && needsToChange(rules[rule][0])) {
+          rules[rule][0] = level;
+        }
+        break;
     }
-    if (rules[rule][0] === "warn" || rules[rule][0] === 1) {
-      rules[rule][0] = "error";
-    }
+  }
+
+  if (!includeExplicit) {
+    Object.assign(rules, explicitRules);
   }
 
   return {
