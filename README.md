@@ -12,14 +12,11 @@ Example `.eslintrc.js`:
 const { normalizeRules } = require("eslint-normalize-rules");
 
 const config = {
-  extends: [
-    "eslint:recommended",
-    "eslint-standard-with-typescript"
-  ],
+  extends: ["eslint:recommended", "eslint-standard-with-typescript"],
   rules: {
-    "no-var": "warn"
-  }
-}
+    "no-var": "warn",
+  },
+};
 
 module.exports = normalizeRules(config);
 ```
