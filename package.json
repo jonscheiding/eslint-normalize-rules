@@ -1,7 +1,7 @@
 {
-  "name": "eslint-rule-override",
+  "name": "eslint-normalize-rules",
   "version": "1.0.0",
-  "description": "Library for overriding eslint rules from extended configs",
+  "description": "Library for normalizing eslint rules from extended configs",
   "main": "index.js",
   "repository": "https://github.com/jonscheiding/eslint-rule-override",
   "author": "Jon Scheiding <jonscheiding@gmail.com>",
